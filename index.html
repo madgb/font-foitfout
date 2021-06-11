@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>FOIT vs. FOUT</title>
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i"
+        />
+        <link rel="stylesheet" href="./index.css" />
+        <script src="./index.js"></script>
+    </head>
+    <body>
+        <h1>FOIT vs FOUT</h1>
+        <section>
+            <h2>What is FOIT and FOUT</h2>
+            <ul>
+                <li>One of the problems of web font</li>
+                <li>
+                    <img src="./foit-fout-animation.gif" alt="" />
+                </li>
+                <li>
+                    <ul>
+                        <li>FOIT (Flash of Invisible Text)</li>
+                        <li>
+                            Does not render any text until webfont is being
+                            rendered
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <ul>
+                        <li>FOUT (Flash of Unstyled Text)</li>
+                        <li>
+                            Show basic browser font until webfont is being
+                            loaded. And then reflow
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <h2>Details of FOIT and FOUT</h2>
+            <ul>
+                <li>FOIT</li>
+                <li>
+                    <ul>
+                        <li>Page will be blocked while font loading</li>
+                        <li>Modern browsers have time limit</li>
+                        <li>
+                            Wait three seconds and show up with the basic font
+                        </li>
+                        <li>Chrome will have the message like below</li>
+                        <li>
+                            <img src="./chrome-msg.png" alt="" />
+                        </li>
+                    </ul>
+                </li>
+                <li>FOUT</li>
+                <li>
+                    <ul>
+                        <li>
+                            The "Flash" of the browser (clients sometimes hate
+                            it)
+                        </li>
+                        <li>
+                            Bad user experience could happen if it hurts the
+                            layout
+                        </li>
+                        <li>
+                            Could suppress the UI crash through the fine
+                            adjustment of CSS like font-size-adjust,
+                            letter-spacing, or line-height
+                        </li>
+                        <li>
+                            Reference:
+                            <a href="https://meowni.ca/font-style-matcher/"
+                                >font-style-matcher</a
+                            >
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <h2>Trade-off</h2>
+            <ul>
+                <li>REDUCE both!</li>
+                <li>Though, blank page is critical</li>
+                <li><i>Raw text data is still meaningful...</i></li>
+                <li>On the other hand, designer may hate FOUT</li>
+                <li>Font reflow can hurt the layout, and UX in the end</li>
+            </ul>
+        </section>
+        <section>
+            <h2>General Timelines</h2>
+            <ul>
+                <li>
+                    FOIT
+                    <img src="./FOIT_01.png" alt="" />
+                </li>
+                <li>
+                    FOUT
+                    <img src="./FOUT_01.png" alt="" />
+                </li>
+                <li><b>Suppress the FOIT / Reduce the FOUT</b></li>
+            </ul>
+        </section>
+        <section>
+            <h2>CSS solution: font-display</h2>
+            <ul>
+                <li>@font-face</li>
+                <li><b>auto</b> - basic behavior of the browser</li>
+                <li><b>block</b> - FOIT, no text until font render</li>
+                <li>
+                    <b>swap</b> - Instructs the browser to use the fallback font to
+                    display the text until the custom font has fully downloaded.
+                    This is also known as a “flash of unstyled text” or FOUT.
+                </li>
+                <li>
+                    <b>fallback</b> - gives the font face an extremely small block
+                    period (100ms or less is recommended in most cases) and a
+                    short swap period (three seconds is recommended in most
+                    cases). In other words, the font face is rendered with a
+                    fallback at first if it’s not loaded, but the font is
+                    swapped as soon as it loads. However, if too much time
+                    passes, the fallback will be used for the rest of the page’s
+                    lifetime. fallback is a good candidate for things like body
+                    text where you’d like the user to start reading as soon as
+                    possible and don’t want to disturb their experience by
+                    shifting text around as a new font loads in.
+                </li>
+                <li>
+                    <b>optional</b> - gives the font face an extremely small block
+                    period (100ms or less is recommended in most cases) and a
+                    zero second swap period. Similar to fallback, this is a good
+                    choice for when the downloading font is more of a “nice to
+                    have” but not critical to the experience. The optional value
+                    leaves it up to the browser to decide whether to initiate
+                    the font download, which it may choose not to do or it may
+                    do it as a low priority depending on what it thinks would be
+                    best for the user. This can be beneficial in situations
+                    where the user is on a weak connection and pulling down a
+                    font may not be the best use of resources.
+                </li>
+                <li> <b>Fallback could be a great option</b> </li>
+            </ul>
+        </section>
+        <section>
+            <h2>Fallback timeline</h2>
+            <ul>
+                <li>
+                    <img src="./fallback_01.png" alt="">
+                </li>
+                <li>
+                    <img src="./fallback_02.png" alt="">
+                </li>
+                <ul>
+                    <li>Downsides</li>
+                    <ul>
+                        <li>Cannot customize swap time and block time</li>
+                        <li>Cannot get callback by font diff event</li>
+                        <li>100ms sometimes is not enough for heavy font(foreign language)</li>
+                    </ul>
+                </ul>
+            </ul>
+        </section>
+        <section>
+            <h2>Not recommended ways to handle them</h2>
+            <h3>data URI</h3>
+            <ul>
+                <li>Get font via data URI</li>
+                <li>Able to avoid both FOIT and FOUT</li>
+                <li>But blocks CSS parsing, slow down the whole page render</li>
+                <li>Could occur a serious speed issue if the font itself is heavy</li>
+            </ul>
+            <h3>local/session storage</h3>
+            <ul>
+                <li>Save the font file as data URI</li>
+                <li>Async, no blocker for page load, but could affect performance</li>
+                <li>Google officially discourage this solution</li>
+            </ul>
+            <h3>FOFT</h3>
+            <ul>
+                <li>Flash of Faux Text</li>
+                <li>Split the subset, get normal font first, and apply fake font for bold and italic</li>
+                <li>Fast loading speed, but UI will flash TWICE</li>
+                <li>Hard to maintain the font-family - need seperate naming convention for each styles</li>
+            </ul>
+        </section>
+        <div class="wrapper">
+            <form id="timeout" class="cf">
+                <p class="warning">
+                    Sorry—this page requires both JavaScript and support for the CSS
+                    Font Loading API.
+                </p>
+                <fieldset>
+                    <legend class="sr-only">Web fonts:</legend>
+                    <div>
+                        <label
+                            ><!-- <input type="checkbox" checked readonly disabled> -->Roman</label
+                        >
+                        <label
+                            ><input
+                                type="number"
+                                id="loadtime-roman"
+                                value="4000"
+                                step="100"
+                            />
+                            ms</label
+                        >
+                    </div>
+                    <div>
+                        <label
+                            ><!-- <input type="checkbox" checked readonly disabled> -->Bold</label
+                        >
+                        <label
+                            ><input
+                                type="number"
+                                id="loadtime-bold"
+                                value="4000"
+                                step="100"
+                            />
+                            ms</label
+                        >
+                    </div>
+                    <div>
+                        <label
+                            ><!-- <input type="checkbox" checked readonly disabled> -->Italic</label
+                        >
+                        <label
+                            ><input
+                                type="number"
+                                id="loadtime-italic"
+                                value="4000"
+                                step="100"
+                            />
+                            ms</label
+                        >
+                    </div>
+                    <div>
+                        <label
+                            ><!-- <input type="checkbox" checked readonly disabled> -->Bold
+                            Italic</label
+                        >
+                        <label
+                            ><input
+                                type="number"
+                                id="loadtime-bolditalic"
+                                value="4000"
+                                step="100"
+                            />
+                            ms</label
+                        >
+                    </div>
+                </fieldset>
+                <div class="buttons cf">
+                    <button type="button" id="randomize">
+                        Randomize Load Times
+                    </button>
+                    <button type="button" id="groupedrepaints">
+                        Force a Grouped Repaint
+                    </button>
+                    <button type="submit" id="startload">Start Font Load</button>
+                </div>
+            </form>
+            <div class="ff-card-pair">
+                <div class="ff-card-panel">
+                    <h2 class="ff-card-label">
+                        FOIT <b>with 3s Timeout</b>
+                        <b class="ff-card-repaints">&#160;</b>
+                    </h2>
+                    <div
+                        class="ff-card ff-card-foit-roman ff-card-foit-bold ff-card-foit-italic ff-card-foit-bolditalic ff-card-start"
+                        id="card1-foit"
+                    >
+                        <h3 class="-bold">
+                            This is <em class="-bolditalic">not</em> light weight
+                        </h3>
+                        <p>
+                            <span class="-roman">This is a paragraph.</span>
+                            <strong class="-bold">This is heavier text.</strong>
+                            <em class="-italic">This is emphasized text.</em>
+                            <strong class="-bolditalic"
+                                ><em
+                                    >This is heavier and emphasized text.</em
+                                ></strong
+                            >
+                        </p>
+                    </div>
+                </div>
+
+                <div class="ff-card-panel">
+                    <h2 class="ff-card-label">
+                        FOUT <b class="ff-card-repaints">&#160;</b>
+                    </h2>
+                    <div
+                        class="ff-card ff-card-fallback ff-card-start"
+                        id="card1-fout"
+                    >
+                        <h3 class="-bold">
+                            This is <em class="-bolditalic">not</em> light weight
+                        </h3>
+                        <p>
+                            <span class="-roman">This is a paragraph.</span>
+                            <strong class="-bold">This is heavier text.</strong>
+                            <em class="-italic">This is emphasized text.</em>
+                            <strong class="-bolditalic"
+                                ><em
+                                    >This is heavier and emphasized text.</em
+                                ></strong
+                            >
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <p>4000ms (4 seconds) is equal to one ~40KB font loading on Fast 3G</p> -->
+    </body>
+</html>
